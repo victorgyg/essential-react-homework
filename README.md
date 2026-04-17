@@ -5,9 +5,7 @@ While having lunch, your CTO and your Tech Leader met and discussed about a tech
 
 ### Homework management 🏠
 
-The final result of all homework is the React Native Application full of features implemented iteratively in the end phase of each module in the course. In order to keep consistency and track all of your changes we highly recommend you to create your own GitHub repository where your work as a participant will be stored. Your GitHub repository should be shared with all trainers, which will enable us to verify your work and communicate:
-- Filip jarno: https://github.com/ziarno
-- Andrii Doroshenko: https://github.com/andriicallstack
+The final result of all homework is the React Native Application full of features implemented iteratively in the end phase of each module in the course. In order to keep consistency and track all of your changes we highly recommend you to create your own GitHub repository where your work as a participant will be stored. Your GitHub repository should be shared with all trainers, which will enable us to verify your work and communicate.
 
 Each module in the course will end up with homework consisting of a few tasks to fulfil. We would like to suggest a comfortable system for you to submit each task of the homework as a separate PR to the main branch in your repository. This will create a space for us to communicate with you, by doing code reviews - thanks to that we will be able to check your homework, discuss some uncertainties, or respond to questions you will leave in the PR. In case you have any trouble with homework you can always book a 1 to 1 session with the trainer, and also don't hesitate to ask your questions in the dedicated communication channel. Keep in mind that you don't have to worry about being blocked for the next homework, every homework will have a starting point, so you always will be able to override the content of your repository with the prepared starting point.
 
@@ -130,13 +128,7 @@ To make things simples for feature implementation and focus on React, we will be
 
 </details>
 
-<details>
-  <summary><b>Step 6: Template cleanup (Optional)</b></summary><br>
-
-The web project template includes starting code that we don’t want - you can remove some unnecessary code, files and assets in this step. This is an optional step because you’re going to change it anyway while working on various features.
-</details>
-
-> 💡 You are now here → https://github.com/callstack-workshops/questrade-react-homework/tree/part-2
+> 💡 You are now here → https://github.com/callstack-workshops/essential-react-homework/tree/part-2
 
 ## Part 2: Add a lottery
 
@@ -187,7 +179,7 @@ Helpful resources:
 - Notification component - https://mui.com/material-ui/react-snackbar/
 - LoadingButton component from MaterialUI is a part of a complimentary library -https://www.npmjs.com/package/@mui/lab
 
-> 💡 You are now here → https://github.com/callstack-workshops/questrade-react-homework/tree/part-3
+> 💡 You are now here → https://github.com/callstack-workshops/essential-react-homework/tree/part-3
 
 ## Part 3: List lotteries
 
@@ -230,7 +222,7 @@ List lotteries feature:
 - Register FAB button should be disabled when no lotteries are selected
 - Register modal should close after successful submission and notification with a message should be shown
 
-> 💡 You are now here → https://github.com/callstack-workshops/questrade-react-homework/tree/part-4
+> 💡 You are now here → https://github.com/callstack-workshops/essential-react-homework/tree/part-4
 
 ## Part 4: Filter lotteries
 
@@ -254,4 +246,4 @@ Filter lotteries:
 - Typing in the input should filter the results
 - When there are no search results for a given filter, no search result information should be displayed
 
-> 💡 You are now here → https://github.com/callstack-workshops/questrade-react-homework/tree/part-4-done 
+> 💡 You are now here → https://github.com/callstack-workshops/essential-react-homework/tree/part-4-done 
