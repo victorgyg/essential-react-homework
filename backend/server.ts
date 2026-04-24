@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Lottery } from './types';
+import { Redis } from '@upstash/redis';
 const express = require('express');
 const cors = require('cors');
-const redis = require('redis');
 const ulid = require('ulid');
 
 // Types
@@ -35,13 +35,47 @@ type RegisterResponse = {
   status: ResponseStatus;
 };
 
-// Redis setup
+// Type guards and helpers
 
-const { REDIS_URL } = process.env;
-const client = redis.createClient({ url: REDIS_URL });
-// This is going to write any Redis error to console.
-client.on('error', (error: Error) => {
-  console.error(error);
+function isLottery(value: unknown): value is Lottery {
+  if (!value || typeof value !== 'object') return false;
+  const obj = value as Record<string, unknown>;
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.name === 'string' &&
+    typeof obj.prize === 'string' &&
+    typeof obj.type === 'string' &&
+    (obj.status === 'running' || obj.status === 'finished')
+  );
+}
+
+function toLottery(data: Record<string, unknown> | null): Lottery | null {
+  if (!data) return null;
+  if (isLottery(data)) return data;
+  return null;
+}
+
+function lotteryToRecord(lottery: Lottery): Record<string, string> {
+  return {
+    id: lottery.id,
+    name: lottery.name,
+    prize: lottery.prize,
+    type: lottery.type,
+    status: lottery.status,
+  };
+}
+
+// Redis setup with Upstash SDK
+
+const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env;
+
+if (!UPSTASH_REDIS_REST_URL || !UPSTASH_REDIS_REST_TOKEN) {
+  console.error('Missing Upstash Redis credentials. Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in .env file');
+}
+
+const client = new Redis({
+  url: UPSTASH_REDIS_REST_URL!,
+  token: UPSTASH_REDIS_REST_TOKEN!,
 });
 
 // Express setup
@@ -65,13 +99,17 @@ app.get(
     res: Response<APIResponse<Lottery[]>>,
   ): Promise<void> => {
     try {
-      const lotteryIds = await client.lRange('lotteries', 0, -1);
+      const lotteryIds = await client.lrange('lotteries', 0, -1);
 
       const transaction = client.multi();
-      lotteryIds.forEach((id: string) => transaction.hGetAll(`lottery.${id}`));
-      const lotteries = await transaction.exec();
+      lotteryIds.forEach((id: string) => transaction.hgetall(`lottery.${id}`));
+      const results = await transaction.exec();
 
-      res.json(lotteries);
+      const lotteries = (results as unknown[])
+        .map((result) => toLottery(result as Record<string, unknown>))
+        .filter((lottery): lottery is Lottery => lottery !== null);
+
+      res.json({ data: lotteries });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Failed to read the lotteries data' });
@@ -114,8 +152,8 @@ app.post(
     try {
       await client
         .multi()
-        .hSet(`lottery.${id}`, newLottery)
-        .lPush('lotteries', id)
+        .hset(`lottery.${id}`, lotteryToRecord(newLottery))
+        .lpush('lotteries', id)
         .exec();
 
       console.log('res', res);
@@ -137,9 +175,10 @@ app.get(
     const { id } = req.params;
 
     try {
-      const lottery = await client.hGetAll(`lottery.${id}`);
+      const data = await client.hgetall(`lottery.${id}`);
+      const lottery = toLottery(data as Record<string, unknown> | null);
 
-      if (!Object.keys(lottery).length) {
+      if (!lottery) {
         res
           .status(404)
           .json({ error: 'A lottery with the given ID does not exist' });
@@ -173,7 +212,7 @@ app.post(
     }
 
     try {
-      const lotteryStatus = await client.hGet(`lottery.${lotteryId}`, 'status');
+      const lotteryStatus = await client.hget(`lottery.${lotteryId}`, 'status');
 
       if (!lotteryStatus) {
         throw new Error("A lottery with the given ID doesn't exist");
@@ -183,7 +222,7 @@ app.post(
         throw new Error('A lottery with the given ID is already finished');
       }
 
-      await client.lPush(`lottery.${lotteryId}.participants`, name);
+      await client.lpush(`lottery.${lotteryId}.participants`, name);
 
       res.json({ status: 'Success' });
     } catch (error) {
@@ -204,7 +243,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Server start
 
-app.listen(port, async () => {
-  await client.connect();
+app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

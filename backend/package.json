@@ -1,13 +1,15 @@
 {
   "name": "bigcorp-lotteries-api",
   "version": "1.0.0",
-  "description": "",
+  "private": true,
+  "description": "BigCorp Lotteries API Server",
   "main": "server.js",
   "scripts": {
+    "build": "tsc server.ts --outDir build-tsc",
     "build:babel": "babel server.ts -d build-babel --extensions '.ts'",
     "build:tsc": "tsc server.ts --outDir build-tsc",
-    "dev": "NODE_ENV=development nodemon --exec ts-node -r dotenv/config server.ts",
-    "prod": "NODE_ENV=production ts-node -r dotenv/config server.ts",
+    "dev": "NODE_ENV=development nodemon --exec ts-node -r dotenv/config server.ts dotenv_config_path=../.env",
+    "prod": "NODE_ENV=production ts-node -r dotenv/config server.ts dotenv_config_path=../.env",
     "check-types": "tsc --noEmit",
     "finalize-lottery": "node -r dotenv/config scripts/finalizeLottery.mjs",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@upstash/redis": "1.37.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "random": "^4.1.0",
