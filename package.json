@@ -1,0 +1,33 @@
+{
+  "name": "bigcorp-lotteries-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for BigCorp lotteries application",
+  "scripts": {
+    "dev": "pnpm --parallel --filter bigcorp-lotteries-api --filter bigcorp-lotteries-web dev",
+    "dev:backend": "pnpm --filter bigcorp-lotteries-api dev",
+    "dev:web": "pnpm --filter bigcorp-lotteries-web dev",
+    "build": "pnpm --recursive run build",
+    "build:backend": "pnpm --filter bigcorp-lotteries-api build",
+    "build:web": "pnpm --filter bigcorp-lotteries-web build",
+    "lint": "pnpm --recursive run lint",
+    "lint:backend": "pnpm --filter bigcorp-lotteries-api lint",
+    "lint:web": "pnpm --filter bigcorp-lotteries-web lint",
+    "test": "pnpm --recursive run test",
+    "clean": "rm -rf node_modules backend/node_modules web/node_modules pnpm-lock.yaml",
+    "install:all": "pnpm install"
+  },
+  "keywords": [
+    "monorepo",
+    "react",
+    "express",
+    "lottery"
+  ],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
