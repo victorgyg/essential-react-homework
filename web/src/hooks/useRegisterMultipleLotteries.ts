@@ -1,12 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiPost } from '../utils/api';
-import type { RegisterRequest, RegisterResponse } from '../types/lottery';
+import type {
+  RegisterRequest,
+  RegisterResponse,
+  Lottery,
+} from '../types/lottery';
 import { useNotification } from './useNotification';
 
 interface RegisterMultipleResult {
   succeeded: number;
   failed: number;
   total: number;
+  failedLotteries: Array<{ lottery: Lottery; error: string }>;
 }
 
 async function registerForLottery(
@@ -29,17 +34,33 @@ async function registerForLottery(
 }
 
 async function registerMultiple(
-  lotteryIds: string[],
+  lotteries: Lottery[],
   name: string,
 ): Promise<RegisterMultipleResult> {
   const results = await Promise.allSettled(
-    lotteryIds.map((id) => registerForLottery({ lotteryId: id, name })),
+    lotteries.map((lottery) =>
+      registerForLottery({ lotteryId: lottery.id, name }).then(() => lottery),
+    ),
   );
 
   const succeeded = results.filter((r) => r.status === 'fulfilled').length;
   const failed = results.filter((r) => r.status === 'rejected').length;
 
-  return { succeeded, failed, total: lotteryIds.length };
+  const failedLotteries = results
+    .map((result, index) => {
+      if (result.status === 'rejected') {
+        return {
+          lottery: lotteries[index],
+          error: result.reason?.message || 'Unknown error',
+        };
+      }
+      return null;
+    })
+    .filter(
+      (item): item is { lottery: Lottery; error: string } => item !== null,
+    );
+
+  return { succeeded, failed, total: lotteries.length, failedLotteries };
 }
 
 export function useRegisterMultipleLotteries() {
@@ -47,14 +68,18 @@ export function useRegisterMultipleLotteries() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: ({
-      lotteryIds,
-      name,
-    }: {
-      lotteryIds: string[];
-      name: string;
-    }) => registerMultiple(lotteryIds, name),
+    mutationFn: ({ lotteries, name }: { lotteries: Lottery[]; name: string }) =>
+      registerMultiple(lotteries, name),
     onSuccess: (result) => {
+      // Show individual error toasts for each failed lottery
+      result.failedLotteries.forEach(({ lottery, error }) => {
+        showNotification(
+          `Failed to register for "${lottery.name}": ${error}`,
+          'error',
+        );
+      });
+
+      // Show success summary
       if (result.failed === 0) {
         showNotification(
           `Successfully registered for ${result.succeeded} ${
@@ -67,12 +92,8 @@ export function useRegisterMultipleLotteries() {
           `Registered for ${result.succeeded} out of ${result.total} lotteries`,
           'warning',
         );
-      } else {
-        showNotification(
-          `Failed to register for all ${result.total} lotteries`,
-          'error',
-        );
       }
+
       queryClient.invalidateQueries({ queryKey: ['lotteries'] });
     },
     onError: (error: Error) => {

@@ -1,19 +1,14 @@
-import { useState, useMemo } from 'react';
-import {
-  Grid,
-  CircularProgress,
-  Alert,
-  Box,
-  Typography,
-  Fade,
-} from '@mui/material';
+import { useState, useMemo, useEffect } from 'react';
+import { Grid, CircularProgress, Box, Typography, Fade } from '@mui/material';
 import { useGetLotteries } from '../hooks/useGetLotteries';
 import { useDebounce } from '../hooks/useDebounce';
+import { useNotification } from '../hooks/useNotification';
 import { LotteryCard } from './LotteryCard';
 import { SearchFilter } from './SearchFilter';
 
 export function LotteryList() {
   const { lotteries, isLoading, error } = useGetLotteries();
+  const { showNotification } = useNotification();
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -27,6 +22,12 @@ export function LotteryList() {
         lottery.prize.toLowerCase().includes(searchLower),
     );
   }, [lotteries, debouncedSearch]);
+
+  useEffect(() => {
+    if (error) {
+      showNotification(error.message || 'Failed to load lotteries', 'error');
+    }
+  }, [error, showNotification]);
 
   if (isLoading) {
     return (
@@ -43,15 +44,7 @@ export function LotteryList() {
     );
   }
 
-  if (error) {
-    return (
-      <Alert severity="error" sx={{ mt: 2 }}>
-        {error.message || 'Failed to load lotteries'}
-      </Alert>
-    );
-  }
-
-  if (lotteries.length === 0) {
+  if (error || lotteries.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 8 }}>
         <Typography variant="h6" color="text.secondary">
