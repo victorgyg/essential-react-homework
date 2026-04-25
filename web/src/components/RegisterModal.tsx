@@ -23,7 +23,7 @@ export function RegisterModal() {
   );
 
   const { formik, isPending } = useRegisterForm({
-    lotteryIds: selectedLotteryIds,
+    lotteries: selectedLotteries,
     onSuccess: () => {
       clearSelection();
       close();

@@ -1,6 +1,7 @@
 import { useTransition } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import type { Lottery } from '../types/lottery';
 import { useRegisterMultipleLotteries } from './useRegisterMultipleLotteries';
 
 const validationSchema = Yup.object({
@@ -10,12 +11,12 @@ const validationSchema = Yup.object({
 });
 
 interface UseRegisterFormProps {
-  lotteryIds: string[];
+  lotteries: Lottery[];
   onSuccess?: () => void;
 }
 
 export function useRegisterForm({
-  lotteryIds,
+  lotteries,
   onSuccess,
 }: UseRegisterFormProps) {
   const { registerMultiple } = useRegisterMultipleLotteries();
@@ -32,7 +33,7 @@ export function useRegisterForm({
     onSubmit: async (values, { resetForm }) => {
       startTransition(() => {
         registerMultiple(
-          { lotteryIds, name: values.name },
+          { lotteries, name: values.name },
           {
             onSuccess: () => {
               resetForm();
