@@ -1,9 +1,18 @@
-import { Grid, CircularProgress, Alert, Box, Typography } from '@mui/material';
+import { useEffect } from 'react';
+import { Grid, CircularProgress, Box, Typography } from '@mui/material';
 import { useGetLotteries } from '../hooks/useGetLotteries';
+import { useNotification } from '../hooks/useNotification';
 import { LotteryCard } from './LotteryCard';
 
 export function LotteryList() {
   const { lotteries, isLoading, error } = useGetLotteries();
+  const { showNotification } = useNotification();
+
+  useEffect(() => {
+    if (error) {
+      showNotification(error.message || 'Failed to load lotteries', 'error');
+    }
+  }, [error, showNotification]);
 
   if (isLoading) {
     return (
@@ -20,15 +29,7 @@ export function LotteryList() {
     );
   }
 
-  if (error) {
-    return (
-      <Alert severity="error" sx={{ mt: 2 }}>
-        {error.message || 'Failed to load lotteries'}
-      </Alert>
-    );
-  }
-
-  if (lotteries.length === 0) {
+  if (error || lotteries.length === 0) {
     return (
       <Box sx={{ textAlign: 'center', py: 8 }}>
         <Typography variant="h6" color="text.secondary">
