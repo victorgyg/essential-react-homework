@@ -27,7 +27,7 @@ export function useAddLotteryForm({ onSuccess }: UseAddLotteryFormProps = {}) {
     },
     validationSchema,
     validateOnMount: false,
-    validateOnChange: false,
+    validateOnChange: true,
     validateOnBlur: true,
     onSubmit: async (values, { resetForm }) => {
       startTransition(() => {
