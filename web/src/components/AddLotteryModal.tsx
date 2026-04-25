@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -8,34 +7,20 @@ import {
   Stack,
   Box,
 } from '@mui/material';
-import { useCreateLottery } from '../hooks/useCreateLottery';
 import { useAddLotteryModal } from '../hooks/useAddLotteryModal';
+import { useAddLotteryForm } from '../hooks/useAddLotteryForm';
 
 export function AddLotteryModal() {
   const { isOpen, close } = useAddLotteryModal();
-  const [name, setName] = useState('');
-  const [prize, setPrize] = useState('');
-  const { createLottery, isLoading } = useCreateLottery();
+  const { formik, isPending } = useAddLotteryForm({
+    onSuccess: close,
+  });
 
   const handleClose = () => {
-    if (!isLoading) {
+    if (!isPending) {
+      formik.resetForm();
       close();
     }
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    createLottery(
-      { name, prize, type: 'simple' },
-      {
-        onSuccess: () => {
-          setName('');
-          setPrize('');
-          close();
-        },
-      },
-    );
   };
 
   return (
@@ -53,25 +38,30 @@ export function AddLotteryModal() {
       }}
     >
       <DialogTitle sx={{ pb: 1 }}>Add a new lottery</DialogTitle>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={formik.handleSubmit}>
         <DialogContent sx={{ pt: 2 }}>
           <Stack spacing={3}>
             <TextField
               label="Lottery name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isLoading}
-              required
+              name="name"
+              value={formik.values.name}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.name && Boolean(formik.errors.name)}
+              helperText={formik.touched.name && formik.errors.name}
+              disabled={isPending}
               fullWidth
-              autoFocus
               variant="standard"
             />
             <TextField
               label="Lottery prize"
-              value={prize}
-              onChange={(e) => setPrize(e.target.value)}
-              disabled={isLoading}
-              required
+              name="prize"
+              value={formik.values.prize}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.prize && Boolean(formik.errors.prize)}
+              helperText={formik.touched.prize && formik.errors.prize}
+              disabled={isPending}
               fullWidth
               variant="standard"
             />
@@ -80,7 +70,7 @@ export function AddLotteryModal() {
             <Button
               type="submit"
               variant="contained"
-              disabled={isLoading}
+              disabled={isPending || !formik.isValid}
               sx={{
                 textTransform: 'uppercase',
                 backgroundColor: '#e0e0e0',
@@ -94,7 +84,7 @@ export function AddLotteryModal() {
                 },
               }}
             >
-              {isLoading ? 'Adding...' : 'Add'}
+              {isPending ? 'Adding...' : 'Add'}
             </Button>
           </Box>
         </DialogContent>
