@@ -19,6 +19,8 @@ export function LotteryCard({ lottery }: LotteryCardProps) {
     <Card
       sx={{
         height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         border: selected ? '2px solid' : '1px solid',
         borderColor: selected ? 'primary.main' : 'grey.300',
         backgroundColor: selected ? 'primary.50' : 'white',
@@ -36,6 +38,10 @@ export function LotteryCard({ lottery }: LotteryCardProps) {
         onClick={handleClick}
         sx={{
           height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-start',
+          justifyContent: 'flex-start',
           p: 4,
         }}
       >
