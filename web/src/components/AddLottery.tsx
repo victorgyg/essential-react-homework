@@ -10,14 +10,9 @@ export function AddLottery() {
       color="primary"
       aria-label="add lottery"
       onClick={open}
-      sx={{
-        position: 'fixed',
-        bottom: 16,
-        right: 16,
-      }}
       variant="extended"
     >
-      <AddIcon />
+      <AddIcon sx={{ mr: 1 }} />
       Add Lottery
     </Fab>
   );
