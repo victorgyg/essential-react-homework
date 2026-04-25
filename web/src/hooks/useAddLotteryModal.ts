@@ -1,11 +1,12 @@
-import { useLotteryModalContext } from '../contexts/LotteryModalContext';
+import { useLotteryModalsContext } from '../contexts/LotteryModalsContext';
 
 export function useAddLotteryModal() {
-  const { isOpen, openModal, closeModal } = useLotteryModalContext();
+  const { isAddModalOpen, openAddModal, closeAddModal } =
+    useLotteryModalsContext();
 
   return {
-    isOpen,
-    open: openModal,
-    close: closeModal,
+    isOpen: isAddModalOpen,
+    open: openAddModal,
+    close: closeAddModal,
   };
 }
