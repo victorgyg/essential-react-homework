@@ -14,6 +14,15 @@ export interface CreateLotteryRequest {
   type: 'simple';
 }
 
+export interface RegisterRequest {
+  lotteryId: string;
+  name: string;
+}
+
+export interface RegisterResponse {
+  status: 'Success' | 'Error';
+}
+
 export type ApiResponse<T> = {
   data?: T;
   error?: string;
